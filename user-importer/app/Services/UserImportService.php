@@ -11,13 +11,15 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ImportCompletedMail;
 
+const PAGINATION = 10;
+
 class UserImportService
 {
     public function __construct(protected UserImport $model){}
 
     public function index()
     {
-        return $this->model->paginate(10);
+        return $this->model->paginate(PAGINATION);
     }
 
     public function store($data)

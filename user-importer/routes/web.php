@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::get('/export', [UserController::class, 'userExport'])->name('users.export');
     });
 
     Route::prefix('user-imports')->group(function () {

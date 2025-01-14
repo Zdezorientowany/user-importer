@@ -18,12 +18,23 @@ export default function Index() {
         router.get(route("user-imports.import"));
     };
 
+    const handleExportClick = () => {
+        window.location.href = route("users.export");
+    };
+
     return (
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 flex justify-between">
                     Users
-                    <Button onClick={handleImportClick}>Import Users</Button>
+                    <div className="flex space-x-2">
+                        <Button onClick={handleImportClick}>
+                            Import Users
+                        </Button>
+                        <Button onClick={handleExportClick}>
+                            Export Users
+                        </Button>
+                    </div>
                 </h2>
             }
         >
