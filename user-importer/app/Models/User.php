@@ -54,4 +54,11 @@ class User extends Authenticatable implements LaratrustUser
     {
         return $this->hasMany(UserImport::class);
     }
+
+    public static function getAdmins()
+    {
+        return self::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->get();
+    }
 }

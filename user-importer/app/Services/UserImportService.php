@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Jobs\ProcessUserRowJob;
 use Illuminate\Support\Facades\Bus;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ImportCompletedMail;
 
 class UserImportService
 {
@@ -63,9 +64,15 @@ class UserImportService
                 $this->updateImportStatus($userImport, ImportStatus::Completed->value);
 
                 activity()
-                    ->performedOn($userImport)
+                    ->performedOn($userImport->user)
                     ->causedBy($userImport->user)
                     ->log('User import completed');
+
+                $admins = User::getAdmins();
+
+                foreach ($admins as $admin) {
+                    Mail::to($admin->email)->send(new ImportCompletedMail($userImport));
+                }
 
             })
             ->catch(function () use ($userImport) {
@@ -73,7 +80,7 @@ class UserImportService
                 $this->updateImportStatus($userImport, ImportStatus::Failed->value);
 
                 activity()
-                    ->performedOn($userImport)
+                    ->performedOn($userImport->user)
                     ->causedBy($userImport->user)
                     ->log('Batch failed during import');
 
