@@ -18,11 +18,18 @@ class UserImportController extends Controller
         ]);
     }
 
+    public function userImport()
+    {
+        return Inertia::render('UserImport/UserImportForm');
+    }
+
     public function store(StoreUserImportRequest $request)
     {
         $file = $request->validated()['file'];
 
         $this->service->processImport($file);
+
+        return redirect()->route('user-imports.index');
     }
 
 

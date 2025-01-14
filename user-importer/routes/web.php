@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserImportController;
 
 Route::get('/', function () {
@@ -25,8 +26,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+    });
+
     Route::prefix('user-imports')->group(function () {
         Route::get('/', [UserImportController::class, 'index'])->name('user-imports.index');
+        Route::get('/import', [UserImportController::class, 'userImport'])->name('user-imports.import');
         Route::post('/', [UserImportController::class, 'store'])->name('user-imports.store');
     });
 
