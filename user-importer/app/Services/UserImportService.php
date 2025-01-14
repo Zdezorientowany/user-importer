@@ -50,8 +50,8 @@ class UserImportService
     {
         // Create a new UserImport record
         $userImport = $this->store([
-            'user_id' => User::first()->id, // For testing purposes
-            // 'user_id' => Auth::id(),
+            // 'user_id' => User::first()->id, // For testing purposes
+            'user_id' => Auth::id(),
             'status' => ImportStatus::InProgress->value,
         ]);
 

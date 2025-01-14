@@ -61,4 +61,5 @@ class User extends Authenticatable implements LaratrustUser
             $query->where('name', 'admin');
         })->get();
     }
+
 }

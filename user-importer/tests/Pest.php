@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\User;
+use App\Models\Role;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -12,8 +15,18 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature', 'Unit');
+
+/*
+|--------------------------------------------------------------------------
+| Datasets
+|--------------------------------------------------------------------------
+*/
+
+dataset('AuthUser', [
+    'Authenticated User' => fn() => User::factory()->create()
+]);
 
 /*
 |--------------------------------------------------------------------------
