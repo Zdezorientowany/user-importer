@@ -23,6 +23,7 @@ services:
             - sail
         depends_on:
             - mysql
+
     mysql:
         image: "mysql/mysql-server:8.0"
         ports:
@@ -63,9 +64,10 @@ services:
             - mysql
 
     mailpit:
-        image: axllent/mailpit
+        image: axllent/mailpit:latest
         ports:
             - "8025:8025"
+            - "1025:1025"
         networks:
             - sail
 networks:

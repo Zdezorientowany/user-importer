@@ -18,8 +18,13 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+
+        // call seeder this tests are in phpunit and registration dont see roles table
+        $this->seed();
+
         $response = $this->post('/register', [
             'name' => 'Test User',
+            'last_name' => 'Test Last Name',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',

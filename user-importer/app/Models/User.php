@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laratrust\Contracts\LaratrustUser;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements LaratrustUser
 {
@@ -48,4 +49,17 @@ class User extends Authenticatable implements LaratrustUser
             'password' => 'hashed',
         ];
     }
+
+    public function userImport(): HasMany
+    {
+        return $this->hasMany(UserImport::class);
+    }
+
+    public static function getAdmins()
+    {
+        return self::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->get();
+    }
+
 }
