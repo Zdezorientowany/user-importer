@@ -17,9 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Disable CSRF for postman testing
-        $middleware->validateCsrfTokens(except: [
-            '/user-imports',
-        ]);
+        // $middleware->validateCsrfTokens(except: [
+        //     '/user-imports',
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
