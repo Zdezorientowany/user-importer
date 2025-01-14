@@ -6,6 +6,9 @@ use App\ImportStatus;
 use App\Models\UserImport;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Jobs\ProcessUserRowJob;
+use Illuminate\Support\Facades\Bus;
+
 
 class UserImportService
 {
@@ -21,24 +24,61 @@ class UserImportService
         return $this->model->create($data);
     }
 
+    private function updateImportStatus($userImport, $status)
+    {
+        $userImport->update([
+            'status' => $status,
+        ]);
+    }
+
+    private function parseCsvFileToJobsArray($file, int $userImportId){
+
+        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $header = str_getcsv(array_shift($lines));
+
+        $jobs = [];
+        foreach ($lines as $line) {
+            $row = array_combine($header, str_getcsv($line));
+            $jobs[] = new ProcessUserRowJob($userImportId, $row);
+        }
+
+        return $jobs;
+    }
+
     public function processImport($file)
     {
         // Create a new UserImport record
-        $this->store([
-            'user_id' => User::first()->id,
+        $userImport = $this->store([
+            'user_id' => User::first()->id, // For testing purposes
             // 'user_id' => Auth::id(),
             'status' => ImportStatus::InProgress->value,
         ]);
 
-        // Parse CSV data into collections
-        $CSV = file_get_contents($file);
-        $lines = explode(PHP_EOL, $CSV);
-        $header = collect(str_getcsv(array_shift($lines)));
-        $rows = collect($lines);
-        $rows = $rows->filter(fn($row) => !empty($row));
-        $data = $rows->map(fn($row) => $header->combine(str_getcsv($row)));
+        $jobs = $this->parseCsvFileToJobsArray($file, $userImport->id);
 
-        dd($data);
+        // Dispatch the batch
+        Bus::batch($jobs)
+            ->then(function () use ($userImport) {
+                // Update status to completed
+                $this->updateImportStatus($userImport, ImportStatus::Completed->value);
+
+                activity()
+                    ->performedOn($userImport)
+                    ->causedBy($userImport->user)
+                    ->log('User import completed');
+
+            })
+            ->catch(function () use ($userImport) {
+                // Update status to failed
+                $this->updateImportStatus($userImport, ImportStatus::Failed->value);
+
+                activity()
+                    ->performedOn($userImport)
+                    ->causedBy($userImport->user)
+                    ->log('Batch failed during import');
+
+            })
+            ->dispatch();
     }
 
 
