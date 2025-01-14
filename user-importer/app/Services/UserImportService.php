@@ -71,7 +71,15 @@ class UserImportService
                 $admins = User::getAdmins();
 
                 foreach ($admins as $admin) {
-                    Mail::to($admin->email)->send(new ImportCompletedMail($userImport));
+                    try {
+                        Mail::to($admin->email)->send(new ImportCompletedMail($userImport));
+                    } catch (\Exception $e) {
+                        activity()
+                            ->performedOn($userImport->user)
+                            ->causedBy($userImport->user)
+                            ->withProperty('error', $e->getMessage())
+                            ->log('Failed to send import completed mail to ' . $admin->email);
+                    }
                 }
 
             })
