@@ -24,8 +24,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'last_name' => fake()->name(),
+            'name' => fake()->word(),
+            'last_name' => fake()->word(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -41,5 +41,13 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    // add user role to user during creation
+    public function user(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->addRole('user');
+        });
     }
 }

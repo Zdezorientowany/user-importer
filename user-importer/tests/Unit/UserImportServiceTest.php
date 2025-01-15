@@ -41,6 +41,11 @@ it('can process user import', function (User $user) {
     $admin = User::factory()->create();
     $admin->addRole('admin');
 
+    // Ensure the storage/test_files directory exists
+    if (!file_exists(storage_path('test_files'))) {
+        mkdir(storage_path('test_files'), 0755, true);
+    }
+
     // create csv file with test data
     $csvPath = storage_path('test_files/test_users.csv');
     $csvContent = <<<CSV

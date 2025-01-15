@@ -11,13 +11,16 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ImportCompletedMail;
 
+// Better to define this in config file or extend from a base service class but we will stick with this for now
+const PAGINATION_COUNT = 10;
+
 class UserImportService
 {
     public function __construct(protected UserImport $model){}
 
     public function index()
     {
-        return $this->model->all();
+        return $this->model->paginate(PAGINATION_COUNT);
     }
 
     public function store($data)

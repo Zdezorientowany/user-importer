@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserImportController;
 
 Route::get('/', function () {
@@ -25,9 +26,28 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index'])
+            ->name('users.index')
+            ->middleware('permission:users-read');
+
+        Route::get('/export', [UserController::class, 'userExport'])
+            ->name('users.export')
+            ->middleware('permission:users-export');
+    });
+
     Route::prefix('user-imports')->group(function () {
-        Route::get('/', [UserImportController::class, 'index'])->name('user-imports.index');
-        Route::post('/', [UserImportController::class, 'store'])->name('user-imports.store');
+        Route::get('/', [UserImportController::class, 'index'])
+            ->name('user-imports.index')
+            ->middleware('permission:users-import-read');
+
+        Route::get('/import', [UserImportController::class, 'userImport'])
+            ->name('user-imports.import')
+            ->middleware('permission:users-import');
+
+        Route::post('/', [UserImportController::class, 'store'])
+            ->name('user-imports.store')
+            ->middleware('permission:users-import');
     });
 
 });
