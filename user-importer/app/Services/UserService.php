@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 
 const PAGINATION = 10;
+const MAX_USERS_PER_FILE = 1000;
 
 class UserService
 {
@@ -28,17 +29,34 @@ class UserService
         })->get(['name', 'last_name', 'email']);
     }
 
-    public function exportUsersCsvData(): string
+    public function exportUsersData(): array
     {
         $users = $this->getAllUsersInfo();
+        $chunks = $users->chunk(MAX_USERS_PER_FILE);
+        $filePaths = [];
 
-        $csvData = "name,lastname,email\n";
-
-        foreach ($users as $user) {
-            $csvData .= "{$user->name},{$user->last_name},{$user->email}\n";
+        // Ensure the storage/exports directory exists
+        if (!file_exists(storage_path('exports'))) {
+            mkdir(storage_path('exports'), 0755, true);
         }
 
-        return $csvData;
+        foreach ($chunks as $index => $chunk) {
+            $csvData = "name,lastname,email\n";
+
+            foreach ($chunk as $user) {
+                $csvData .= "{$user->name},{$user->last_name},{$user->email}\n";
+            }
+
+            $fileName = $chunks->count() > 1
+                ? "users_part_" . ($index + 1) . ".csv"
+                : "users.csv";
+
+            $filePath = storage_path("exports/{$fileName}");
+            file_put_contents($filePath, $csvData);
+            $filePaths[] = $filePath;
+        }
+
+        return $filePaths;
     }
 
 }

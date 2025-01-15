@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\UserService;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Response;
+use STS\ZipStream\Facades\Zip;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use STS\ZipStream\Builder as ZipStreamedResponse;
 
 class UserController extends Controller
 {
@@ -17,16 +20,20 @@ class UserController extends Controller
         ]);
     }
 
-    public function userExport(): \Illuminate\Http\Response
+    public function userExport(): BinaryFileResponse|ZipStreamedResponse
     {
-        $csvData = $this->service->exportUsersCsvData();
+        $filePaths = $this->service->exportUsersData();
 
-        $fileName = 'users_export.csv';
+        if (count($filePaths) === 1) {
+            // Single file
+            $filePath = $filePaths[0];
+            return Response::download($filePath)->deleteFileAfterSend();
+        } else {
+            // Multiple files as ZIP
+            $zipFileName = 'users_export.zip';
 
-        return Response::make($csvData, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename={$fileName}",
-        ]);
+            return  Zip::create($zipFileName, $filePaths);
+        }
     }
 
 }

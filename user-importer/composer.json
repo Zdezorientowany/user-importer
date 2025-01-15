@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.9",
         "santigarcor/laratrust": "^8.3",
         "spatie/laravel-activitylog": "^4.9",
+        "stechstudio/laravel-zipstream": "^5.3",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
