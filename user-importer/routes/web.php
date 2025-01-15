@@ -27,14 +27,27 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::prefix('users')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('users.index');
-        Route::get('/export', [UserController::class, 'userExport'])->name('users.export');
+        Route::get('/', [UserController::class, 'index'])
+            ->name('users.index')
+            ->middleware('permission:users-read');
+
+        Route::get('/export', [UserController::class, 'userExport'])
+            ->name('users.export')
+            ->middleware('permission:users-export');
     });
 
     Route::prefix('user-imports')->group(function () {
-        Route::get('/', [UserImportController::class, 'index'])->name('user-imports.index');
-        Route::get('/import', [UserImportController::class, 'userImport'])->name('user-imports.import');
-        Route::post('/', [UserImportController::class, 'store'])->name('user-imports.store');
+        Route::get('/', [UserImportController::class, 'index'])
+            ->name('user-imports.index')
+            ->middleware('permission:users-import-read');
+
+        Route::get('/import', [UserImportController::class, 'userImport'])
+            ->name('user-imports.import')
+            ->middleware('permission:users-import');
+
+        Route::post('/', [UserImportController::class, 'store'])
+            ->name('user-imports.store')
+            ->middleware('permission:users-import');
     });
 
 });
