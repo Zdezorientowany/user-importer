@@ -7,6 +7,7 @@ This project is an admin panel that supports the following features:
 - Role-based access control for users, allowing admins to manage the system.
 - Display a list of users with paginated data tables.
 - Asynchronous user import from CSV files.
+- Email notification system about import details
 - Export of users to CSV files (with large datasets split into multiple files and zipped if needed).
 - Import history display
 - Loging and storing errors in database
